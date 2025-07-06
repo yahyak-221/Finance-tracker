@@ -60,3 +60,21 @@ button {
 canvas {
   margin-top: 30px;
 }
+
+/* Dark mode toggle */
+body.dark {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+body.dark .container {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+body.dark input,
+body.dark button {
+  background-color: #2e2e2e;
+  color: #fff;
+  border: 1px solid #444;
+}
