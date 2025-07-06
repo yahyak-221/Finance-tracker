@@ -12,6 +12,12 @@
 <body>
     <div class="container">
         <button id="toggle-theme">🌙 Toggle Dark Mode</button>
+        <div class="budget">
+            <label>
+                Monthly Budget: ₹<input type="number" id="budget" />
+            </label>
+            <p id="budget-warning" style="color: red; font-weight: bold;"></p>
+        </div>
         <h1>💸 Finance Tracker</h1>
 
         <div class="balance">
@@ -24,20 +30,41 @@
 
         <form id="transaction-form">
             <input type="text" id="text" placeholder="Description" required />
-            <input type="number" id="amount" placeholder="Amount (e.g. -500, 2000)" required />
+            <input type="number" id="amount" placeholder="Amount" required />
+            <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="Food">🍔 Food</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Travel">✈️ Travel</option>
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Other">🧾 Other</option>
+            </select>
             <button type="submit">Add Transaction</button>
         </form>
+
+
+
 
         <ul id="transaction-list"></ul>
 
         <canvas id="chart" width="300" height="300"></canvas>
     </div>
 
-    <div class="budget">
-        <label>
-            Monthly Budget: ₹<input type="number" id="budget" />
-        </label>
-        <p id="budget-warning" style="color: red; font-weight: bold;"></p>
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Transaction</h3>
+            <input type="text" id="edit-text" />
+            <input type="number" id="edit-amount" />
+            <select id="edit-category">
+                <option value="Food">🍔 Food</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Travel">✈️ Travel</option>
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Other">🧾 Other</option>
+            </select>
+            <button id="save-edit">Save</button>
+            <button id="cancel-edit">Cancel</button>
+        </div>
     </div>
 
 
