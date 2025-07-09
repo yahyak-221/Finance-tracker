@@ -6,71 +6,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Personal Finance Tracker</title>
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./pin.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <button id="toggle-theme">🌙 Toggle Dark Mode</button>
-        <div class="budget">
-            <label>
-                Monthly Budget: ₹<input type="number" id="budget" />
-            </label>
-            <p id="budget-warning" style="color: red; font-weight: bold;"></p>
-        </div>
-        <h1>💸 Finance Tracker</h1>
 
-        <div class="balance">
-            <h2>Balance: ₹<span id="balance">0</span></h2>
-            <div class="summary">
-                <p>Income: ₹<span id="income">0</span></p>
-                <p>Expense: ₹<span id="expense">0</span></p>
+    <!-- Glass background for lock screen -->
+    <div id="glass-overlay"></div>
+
+    <!-- Main app UI -->
+    <div class="container" id="app-content">
+        <div class="container">
+            <button id="toggle-theme">Toggle Dark Mode</button>
+
+            <!-- Summary cards -->
+            <div class="cards">
+                <div class="card" id="card-income">Income: ₹0</div>
+                <div class="card" id="card-expense">Expense: ₹0</div>
+                <div class="card" id="card-net">Net: ₹0</div>
+                <div class="card" id="card-percentage">Budget used: 0%</div>
+            </div>
+
+            <div class="budget">
+                <label>Monthly Budget: <input type="number" id="budget" /></label>
+                <p id="budget-warning"></p>
+            </div>
+
+            <h1>Finance Tracker</h1>
+
+            <form id="transaction-form">
+                <input type="text" id="text" placeholder="Description" required />
+                <input type="number" id="amount" placeholder="Amount" required />
+
+                <select id="type-select" required>
+                    <option value="">Type</option>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+
+                <select id="category" class="hidden">
+                    <option value="">Select Category</option>
+                    <option value="Books">📚 Books</option>
+                    <option value="Charity">❤️ Charity</option>
+                    <option value="Clothing">👗 Clothing</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Food">🍔 Food</option>
+                    <option value="Health & Hygiene">🧼 Health & Hygiene</option>
+                    <option value="Housing">🏠 Housing</option>
+                    <option value="Medical">🩺 Medical</option>
+                    <option value="School Work">📘 School Work</option>
+                    <option value="Stationery">✏️ Stationery</option>
+                    <option value="Transportation">🚗 Transportation</option>
+                    <option value="Tuition & School Fees">🎓 Tuition & School Fees</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Other">🧾 Other</option>
+                </select>
+
+                <button type="submit">Add Transaction</button>
+                <select id="currency-select">
+                    <option value="₹">₹ INR</option>
+                    <option value="$">$ USD</option>
+                    <option value="€">€ EUR</option>
+                    <option value="£">£ GBP</option>
+                </select>
+            </form>
+
+            <div id="filters">
+                <input type="text" id="search-text" placeholder="Search by text..." />
+                <select id="search-category">
+                    <option value="">Select Category</option>
+                    <option value="Books">📚 Books</option>
+                    <option value="Charity">❤️ Charity</option>
+                    <option value="Clothing">👗 Clothing</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Food">🍔 Food</option>
+                    <option value="Health & Hygiene">🧼 Health & Hygiene</option>
+                    <option value="Housing">🏠 Housing</option>
+                    <option value="Medical">🩺 Medical</option>
+                    <option value="School Work">📘 School Work</option>
+                    <option value="Stationery">✏️ Stationery</option>
+                    <option value="Transportation">🚗 Transportation</option>
+                    <option value="Tuition & School Fees">🎓 Tuition & School Fees</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Other">🧾 Other</option>
+                </select>
+            </div>
+
+            <div id="transaction-history"></div>
+            <canvas id="chart" width="300" height="300"></canvas>
+        </div>
+
+        <div id="edit-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Edit Transaction</h3>
+                <input type="text" id="edit-text" />
+                <input type="number" id="edit-amount" />
+                <select id="edit-category">
+                    <option value="">Select Category</option>
+                    <option value="Books">📚 Books</option>
+                    <option value="Charity">❤️ Charity</option>
+                    <option value="Clothing">👗 Clothing</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Food">🍔 Food</option>
+                    <option value="Health & Hygiene">🧼 Health & Hygiene</option>
+                    <option value="Housing">🏠 Housing</option>
+                    <option value="Medical">🩺 Medical</option>
+                    <option value="School Work">📘 School Work</option>
+                    <option value="Stationery">✏️ Stationery</option>
+                    <option value="Transportation">🚗 Transportation</option>
+                    <option value="Tuition & School Fees">🎓 Tuition & School Fees</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Other">🧾 Other</option>
+                </select>
+                <button id="save-edit">Save</button>
+                <button id="cancel-edit">Cancel</button>
             </div>
         </div>
-
-        <form id="transaction-form">
-            <input type="text" id="text" placeholder="Description" required />
-            <input type="number" id="amount" placeholder="Amount" required />
-            <select id="category" required>
-                <option value="">Select Category</option>
-                <option value="Food">🍔 Food</option>
-                <option value="Rent">🏠 Rent</option>
-                <option value="Travel">✈️ Travel</option>
-                <option value="Entertainment">🎬 Entertainment</option>
-                <option value="Other">🧾 Other</option>
-            </select>
-            <button type="submit">Add Transaction</button>
-        </form>
-
-
-
-
-        <ul id="transaction-list"></ul>
-
-        <canvas id="chart" width="300" height="300"></canvas>
     </div>
 
-    <div id="edit-modal" class="modal hidden">
+
+    <!-- PIN Lock Screen -->
+    <div id="lock-screen" class="modal">
         <div class="modal-content">
-            <h3>Edit Transaction</h3>
-            <input type="text" id="edit-text" />
-            <input type="number" id="edit-amount" />
-            <select id="edit-category">
-                <option value="Food">🍔 Food</option>
-                <option value="Rent">🏠 Rent</option>
-                <option value="Travel">✈️ Travel</option>
-                <option value="Entertainment">🎬 Entertainment</option>
-                <option value="Other">🧾 Other</option>
-            </select>
-            <button id="save-edit">Save</button>
-            <button id="cancel-edit">Cancel</button>
+            <h2>Enter PIN</h2>
+            <input type="password" id="pin-input" maxlength="6" placeholder="Enter your PIN" />
+            <button id="unlock-btn">Unlock</button>
+            <p id="pin-error" style="color: red;"></p>
+        </div>
+    </div>
+
+    <!-- PIN Setup Screen (for first-time users) -->
+    <div id="set-pin-screen" class="modal hidden">
+        <div class="modal-content">
+            <h2>Set a PIN</h2>
+            <input type="password" id="new-pin" maxlength="6" placeholder="Set a 4-digit PIN" />
+            <button id="set-pin-btn">Set PIN</button>
         </div>
     </div>
 
 
     <script src="./script.js"></script>
-    <script src="./darkmode.js"></script>
-    <script src="./monthly.js"></script>
+    <script src="./pin.js"></script>
 </body>
 
 </html>
