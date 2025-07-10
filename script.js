@@ -3,14 +3,17 @@ const form = document.getElementById("transaction-form");
 const textInput = document.getElementById("text");
 const amountInput = document.getElementById("amount");
 const categoryInput = document.getElementById("category");
-const list = document.getElementById("transaction-history");
-const balanceEl = document.getElementById("card-net");
-const incomeEl = document.getElementById("card-income");
-const expenseEl = document.getElementById("card-expense");
-const percentEl = document.getElementById("card-percentage");
-const toggleBtn = document.getElementById("toggle-theme");
+const incomeList = document.getElementById("income-list");
+const expenseList = document.getElementById("expense-list");
+const incomeSummary = document.getElementById("income-summary");
+const expenseSummary = document.getElementById("expense-summary");
+const netSummary = document.getElementById("net-summary");
+const percentSummary = document.getElementById("percent-summary");
 const budgetInput = document.getElementById("budget");
 const budgetWarning = document.getElementById("budget-warning");
+const typeSelect = document.getElementById("type-select");
+const currencySelect = document.getElementById("currency-select");
+const toggleBtn = document.getElementById("toggle-theme");
 
 const editModal = document.getElementById("edit-modal");
 const editText = document.getElementById("edit-text");
@@ -19,265 +22,83 @@ const editCategory = document.getElementById("edit-category");
 const saveEditBtn = document.getElementById("save-edit");
 const cancelEditBtn = document.getElementById("cancel-edit");
 
-const searchText = document.getElementById("search-text");
-const searchCategory = document.getElementById("search-category");
-
-const currencySelect = document.getElementById("currency-select");
-const typeSelect = document.getElementById("type-select");
-
-// Data
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let filteredTransactions = [...transactions];
-let editId = null;
 let currency = localStorage.getItem("selectedCurrency") || "₹";
+currencySelect.value = currency;
 
-// Save to localStorage
+// Populate edit-category dropdown
+function populateEditCategories() {
+  editCategory.innerHTML = categoryInput.innerHTML;
+}
+populateEditCategories();
+
 function saveData() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// Format display currency (no conversion)
 function formatCurrency(amount) {
   return `${currency}${Math.abs(amount).toFixed(2)}`;
 }
 
-// Add transaction
 function addTransaction(e) {
   e.preventDefault();
   const text = textInput.value.trim();
-  let amount = +amountInput.value.trim();
-  const category = categoryInput.value;
+  const amount = +amountInput.value.trim();
   const type = typeSelect.value;
+  const category = type === "expense" ? categoryInput.value : "Income";
 
-  if (
-    text &&
-    amount &&
-    type &&
-    (type === "income" || (type === "expense" && category))
-  ) {
-    amount = type === "expense" ? -Math.abs(amount) : Math.abs(amount);
-    const transaction = {
-      id: Date.now(),
-      text,
-      amount,
-      type,
-      category: type === "income" ? "Income" : category,
-    };
+  if (!text || !amount || !type || (type === "expense" && !category)) return;
 
-    transactions.push(transaction);
-    saveData();
-    applyFilters();
-  }
+  const txn = {
+    id: Date.now(),
+    text,
+    amount: type === "expense" ? -Math.abs(amount) : Math.abs(amount),
+    type,
+    category,
+  };
 
+  transactions.push(txn);
+  saveData();
   form.reset();
   categoryInput.classList.add("hidden");
+  render();
 }
 
-// Edit transaction
-function editTransaction(id) {
-  const t = transactions.find((txn) => txn.id === id);
-  if (!t) return;
-
-  editText.value = t.text;
-  editAmount.value = Math.abs(t.amount);
-  editCategory.value = t.category;
-  editId = id;
-  editModal.classList.remove("hidden");
-}
-
-saveEditBtn.addEventListener("click", () => {
-  const updatedText = editText.value.trim();
-  const updatedAmount = +editAmount.value.trim();
-  const updatedCategory = editCategory.value;
-
-  if (updatedText && updatedAmount && updatedCategory) {
-    transactions = transactions.map((t) =>
-      t.id === editId
-        ? {
-            ...t,
-            text: updatedText,
-            amount: t.amount < 0 ? -updatedAmount : updatedAmount,
-            category: updatedCategory,
-          }
-        : t
-    );
-    saveData();
-    editModal.classList.add("hidden");
-    editId = null;
-    applyFilters();
-  }
-});
-
-cancelEditBtn.addEventListener("click", () => {
-  editModal.classList.add("hidden");
-  editId = null;
-});
-
-// Delete
 function removeTransaction(id) {
   if (!confirm("Are you sure you want to delete this transaction?")) return;
   transactions = transactions.filter((t) => t.id !== id);
   saveData();
-  applyFilters();
-}
-
-// Filter
-function applyFilters() {
-  const text = searchText.value.toLowerCase();
-  const category = searchCategory.value;
-
-  filteredTransactions = transactions.filter((t) => {
-    const matchText = t.text.toLowerCase().includes(text);
-    const matchCategory = !category || t.category === category;
-    return matchText && matchCategory;
-  });
-
   render();
 }
 
-// Render
-function render() {
-  list.innerHTML = "";
-  let income = 0;
-  let expense = 0;
-
-  filteredTransactions.forEach((t) => {
-    const sign = t.amount < 0 ? "-" : "+";
-    const item = document.createElement("li");
-    item.classList.add(t.amount < 0 ? "expense" : "income");
-    item.innerHTML = `
-      ${t.text} (${t.category}) <span>${sign}${formatCurrency(t.amount)}</span>
-      <button onclick="editTransaction(${t.id})">✏️</button>
-      <button onclick="removeTransaction(${t.id})">❌</button>
-    `;
-    list.appendChild(item);
-
-    if (t.amount < 0) expense += t.amount;
-    else income += t.amount;
-  });
-
-  const net = income + expense;
-  const totalBudget = +budgetInput.value || 0;
-  const percentUsed = totalBudget
-    ? ((Math.abs(expense) / totalBudget) * 100).toFixed(1)
-    : 0;
-
-  incomeEl.textContent = `Income: ${formatCurrency(income)}`;
-  expenseEl.textContent = `Expense: ${formatCurrency(Math.abs(expense))}`;
-  balanceEl.textContent = `Net: ${formatCurrency(net)}`;
-  percentEl.textContent = `Budget used: ${percentUsed}%`;
-
-  updateChart();
-  checkBudget();
+function editTransaction(id) {
+  const txn = transactions.find((t) => t.id === id);
+  if (!txn) return;
+  editText.value = txn.text;
+  editAmount.value = Math.abs(txn.amount);
+  editCategory.value = txn.category;
+  editModal.classList.remove("hidden");
+  editModal.dataset.id = id;
 }
 
-// Chart
-let chart;
-function updateChart() {
-  const categoryTotals = {};
-  transactions.forEach((t) => {
-    if (t.amount < 0) {
-      categoryTotals[t.category] =
-        (categoryTotals[t.category] || 0) + Math.abs(t.amount);
-    }
-  });
-
-  const labels = Object.keys(categoryTotals);
-  const data = Object.values(categoryTotals);
-  const ctx = document.getElementById("chart").getContext("2d");
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [
-        {
-          data,
-          backgroundColor: [
-            "#f44336",
-            "#2196f3",
-            "#ff9800",
-            "#9c27b0",
-            "#009688",
-            "#4caf50",
-            "#ff5722",
-            "#607d8b",
-            "#e91e63",
-            "#795548",
-          ],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: (context) =>
-              `${labels[context.dataIndex]}: ${currency}${
-                context.formattedValue
-              }`,
-          },
-        },
-        legend: { position: "bottom" },
-      },
-    },
-  });
-}
-
-// Budget
-function checkBudget() {
-  const budget = +budgetInput.value;
-  const totalExpense = transactions
-    .filter((t) => t.amount < 0)
-    .reduce((sum, t) => sum + t.amount, 0);
-  const used = Math.abs(totalExpense);
-  const usage = (used / budget) * 100;
-
-  if (!budget) {
-    budgetWarning.textContent = "";
-    return;
-  }
-
-  if (usage >= 100) {
-    budgetWarning.textContent = "❌ Budget Exceeded!";
-    budgetWarning.style.color = "red";
-  } else if (usage >= 80) {
-    budgetWarning.textContent = "⚠️ Nearing budget limit!";
-    budgetWarning.style.color = "orange";
-  } else {
-    budgetWarning.textContent = "";
-  }
-}
-
-// Events
-budgetInput.addEventListener("input", () => {
-  localStorage.setItem("monthlyBudget", budgetInput.value);
-  checkBudget();
-});
-const savedBudget = localStorage.getItem("monthlyBudget");
-if (savedBudget) budgetInput.value = savedBudget;
-
-currencySelect.addEventListener("change", () => {
-  currency = currencySelect.value;
-  localStorage.setItem("selectedCurrency", currency);
+saveEditBtn.onclick = () => {
+  const id = +editModal.dataset.id;
+  const txn = transactions.find((t) => t.id === id);
+  if (!txn) return;
+  txn.text = editText.value.trim();
+  txn.amount =
+    txn.amount < 0 ? -Math.abs(+editAmount.value) : +editAmount.value;
+  txn.category = editCategory.value;
+  saveData();
+  editModal.classList.add("hidden");
   render();
-});
-currencySelect.value = currency;
+};
 
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem(
-    "theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  );
-});
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
+cancelEditBtn.onclick = () => {
+  editModal.classList.add("hidden");
+};
 
-typeSelect.addEventListener("change", () => {
+typeSelect.onchange = () => {
   if (typeSelect.value === "expense") {
     categoryInput.classList.remove("hidden");
     categoryInput.setAttribute("required", "required");
@@ -286,21 +107,159 @@ typeSelect.addEventListener("change", () => {
     categoryInput.removeAttribute("required");
     categoryInput.value = "";
   }
-});
+};
 
-searchText.addEventListener("input", applyFilters);
-searchCategory.addEventListener("change", applyFilters);
+currencySelect.onchange = () => {
+  currency = currencySelect.value;
+  localStorage.setItem("selectedCurrency", currency);
+  render();
+};
+
+toggleBtn.onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+};
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+budgetInput.oninput = () => {
+  localStorage.setItem("monthlyBudget", budgetInput.value);
+  render();
+};
+
+const savedBudget = localStorage.getItem("monthlyBudget");
+if (savedBudget) budgetInput.value = savedBudget;
+
+function render() {
+  incomeList.innerHTML = "";
+  expenseList.innerHTML = "";
+
+  let income = 0;
+  let expense = 0;
+
+  transactions.forEach((t) => {
+    const el = document.createElement("li");
+    el.innerHTML = `
+      ${t.text} (${t.category}) <span>${formatCurrency(t.amount)}</span>
+      <button onclick="editTransaction(${t.id})">✏️</button>
+      <button onclick="removeTransaction(${t.id})">❌</button>
+    `;
+
+    if (t.amount < 0) {
+      expense += t.amount;
+      expenseList.appendChild(el);
+    } else {
+      income += t.amount;
+      incomeList.appendChild(el);
+    }
+  });
+
+  const net = income + expense;
+  const budget = +budgetInput.value || 0;
+  const percentUsed = budget
+    ? ((Math.abs(expense) / budget) * 100).toFixed(1)
+    : 0;
+
+  incomeSummary.textContent = formatCurrency(income);
+  expenseSummary.textContent = formatCurrency(Math.abs(expense));
+  netSummary.textContent = formatCurrency(net);
+  percentSummary.textContent = `${percentUsed}%`;
+
+  if (!budget) {
+    budgetWarning.textContent = "";
+  } else if (percentUsed >= 100) {
+    budgetWarning.textContent = "❌ Budget Exceeded!";
+    budgetWarning.style.color = "red";
+  } else if (percentUsed >= 80) {
+    budgetWarning.textContent = "⚠️ Nearing budget limit!";
+    budgetWarning.style.color = "orange";
+  } else {
+    budgetWarning.textContent = "";
+  }
+
+  updateChart();
+}
+
+let chart;
+function updateChart() {
+  const ctx = document.getElementById("chart").getContext("2d");
+  const categories = {};
+
+  transactions.forEach((t) => {
+    if (t.amount < 0) {
+      categories[t.category] =
+        (categories[t.category] || 0) + Math.abs(t.amount);
+    }
+  });
+
+  const data = {
+    labels: Object.keys(categories),
+    datasets: [
+      {
+        data: Object.values(categories),
+        backgroundColor: [
+          "#f44336",
+          "#2196f3",
+          "#ff9800",
+          "#9c27b0",
+          "#009688",
+          "#4caf50",
+          "#ff5722",
+          "#607d8b",
+          "#e91e63",
+          "#795548",
+        ],
+      },
+    ],
+  };
+
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: "doughnut",
+    data,
+    options: {
+      plugins: {
+        legend: { position: "bottom" },
+        tooltip: {
+          callbacks: {
+            label: (context) =>
+              `${context.label}: ${currency}${context.formattedValue}`,
+          },
+        },
+      },
+    },
+  });
+}
+
 form.addEventListener("submit", addTransaction);
 
-const sortable = new Sortable(list, {
+new Sortable(incomeList, {
   onEnd: (evt) => {
-    const moved = filteredTransactions.splice(evt.oldIndex, 1)[0];
-    filteredTransactions.splice(evt.newIndex, 0, moved);
-    transactions = filteredTransactions;
+    const incomeTxns = transactions.filter((t) => t.amount >= 0);
+    const expenseTxns = transactions.filter((t) => t.amount < 0);
+    const moved = incomeTxns.splice(evt.oldIndex, 1)[0];
+    incomeTxns.splice(evt.newIndex, 0, moved);
+    transactions = [...incomeTxns, ...expenseTxns];
     saveData();
     render();
   },
 });
 
-// Init
-applyFilters();
+new Sortable(expenseList, {
+  onEnd: (evt) => {
+    const incomeTxns = transactions.filter((t) => t.amount >= 0);
+    const expenseTxns = transactions.filter((t) => t.amount < 0);
+    const moved = expenseTxns.splice(evt.oldIndex, 1)[0];
+    expenseTxns.splice(evt.newIndex, 0, moved);
+    transactions = [...incomeTxns, ...expenseTxns];
+    saveData();
+    render();
+  },
+});
+
+render();

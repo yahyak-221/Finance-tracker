@@ -6,68 +6,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Finance Tracker</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./pin.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 
 <body>
-    <div id="glass-overlay"></div>
     <button id="toggle-theme" aria-label="Toggle Dark Mode">🌙</button>
-
-    <div id="app-content" class="app-shell">
-        <header class="top-nav">
+    <div class="app-container">
+        <header class="summary-header">
             <h1 class="brand">Finance Tracker</h1>
+            <div class="summary-grid">
+                <div class="summary-card income">
+                    <div class="icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="info">
+                        <h3>Income</h3>
+                        <p id="income-summary">₹0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card expense">
+                    <div class="icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="info">
+                        <h3>Expenses</h3>
+                        <p id="expense-summary">₹0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card net">
+                    <div class="icon"><i class="fas fa-wallet"></i></div>
+                    <div class="info">
+                        <h3>Net Savings</h3>
+                        <p id="net-summary">₹0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card percentage">
+                    <div class="icon"><i class="fas fa-percentage"></i></div>
+                    <div class="info">
+                        <h3>% Used</h3>
+                        <p id="percent-summary">0%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="budget-setter">
+                <label for="budget">Monthly Budget:</label>
+                <input type="number" id="budget" placeholder="Set your goal..." />
+                <div id="budget-warning" class="budget-warning"></div>
+            </div>
         </header>
 
-        <section class="summary-cards">
-            <div class="summary-card" id="card-income">
-                <div class="card-icon income-icon"></div>
-                <div class="card-details">
-                    <h3>Income</h3>
-                    <p class="amount"></p>
-                </div>
-            </div>
-            <div class="summary-card" id="card-expense">
-                <div class="card-icon expense-icon"></div>
-                <div class="card-details">
-                    <h3>Expenses</h3>
-                    <p class="amount"></p>
-                </div>
-            </div>
-            <div class="summary-card" id="card-net">
-                <div class="card-icon net-icon"></div>
-                <div class="card-details">
-                    <h3>Net Savings</h3>
-                    <p class="amount"></p>
-                </div>
-            </div>
-            <div class="summary-card" id="card-percentage">
-                <div class="card-icon percent-icon"></div>
-                <div class="card-details">
-                    <h3>% Used</h3>
-                    <p class="amount"></p>
-                </div>
-            </div>
-        </section>
-
-        <section class="budget-section">
-            <label for="budget">Monthly Budget:</label>
-            <input type="number" id="budget" placeholder="Set your goal..." />
-            <div id="budget-warning" class="budget-warning"></div>
-        </section>
-
-        <section class="transaction-form-card">
-            <form id="transaction-form">
+        <main class="transaction-area">
+            <form id="transaction-form" class="transaction-form">
                 <input type="text" id="text" placeholder="Description" required />
                 <input type="number" id="amount" placeholder="Amount" required />
-
                 <select id="type-select" required>
                     <option value="">Transaction Type</option>
                     <option value="income">Income</option>
                     <option value="expense">Expense</option>
                 </select>
-
                 <select id="category" class="hidden">
                     <option value="">Select Category</option>
                     <option value="Books">Books</option>
@@ -85,40 +81,23 @@
                     <option value="Utilities">Utilities</option>
                     <option value="Other">Other</option>
                 </select>
-
                 <select id="currency-select">
                     <option value="₹">₹ INR</option>
                     <option value="$">$ USD</option>
                     <option value="€">€ EUR</option>
                     <option value="£">£ GBP</option>
                 </select>
-
-                <button type="submit" class="btn-primary">Add Transaction</button>
+                <button type="submit" class="btn-primary">Add</button>
             </form>
-        </section>
 
-        <section id="filters" class="filters">
-            <input type="text" id="search-text" placeholder="Search by text..." />
-            <select id="search-category">
-                <option value="">Filter by Category</option>
-                <option value="Books">Books</option>
-                <option value="Charity">Charity</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Food">Food</option>
-                <option value="Health & Hygiene">Health & Hygiene</option>
-                <option value="Housing">Housing</option>
-                <option value="Medical">Medical</option>
-                <option value="School Work">School Work</option>
-                <option value="Stationery">Stationery</option>
-                <option value="Transportation">Transportation</option>
-                <option value="Tuition & School Fees">Tuition & School Fees</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Other">Other</option>
-            </select>
-        </section>
+            <div class="transaction-history">
+                <h2>Income Transactions</h2>
+                <ul id="income-list"></ul>
 
-        <section id="transaction-history" class="transaction-history"></section>
+                <h2>Expense Transactions</h2>
+                <ul id="expense-list"></ul>
+            </div>
+        </main>
 
         <section class="chart-section">
             <h2>Spending Overview</h2>
@@ -131,23 +110,7 @@
             <h3>Edit Transaction</h3>
             <input type="text" id="edit-text" />
             <input type="number" id="edit-amount" />
-            <select id="edit-category">
-                <option value="">Select Category</option>
-                <option value="Books">Books</option>
-                <option value="Charity">Charity</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Food">Food</option>
-                <option value="Health & Hygiene">Health & Hygiene</option>
-                <option value="Housing">Housing</option>
-                <option value="Medical">Medical</option>
-                <option value="School Work">School Work</option>
-                <option value="Stationery">Stationery</option>
-                <option value="Transportation">Transportation</option>
-                <option value="Tuition & School Fees">Tuition & School Fees</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Other">Other</option>
-            </select>
+            <select id="edit-category"></select>
             <div class="modal-actions">
                 <button id="save-edit" class="btn-primary">Save</button>
                 <button id="cancel-edit" class="btn-secondary">Cancel</button>
@@ -155,25 +118,7 @@
         </div>
     </div>
 
-    <div id="lock-screen" class="modal">
-        <div class="modal-content glass">
-            <h2>Enter PIN</h2>
-            <input type="password" id="pin-input" maxlength="6" placeholder="Enter your PIN" />
-            <button id="unlock-btn" class="btn-primary">Unlock</button>
-            <p id="pin-error" class="error-text"></p>
-        </div>
-    </div>
-
-    <div id="set-pin-screen" class="modal hidden">
-        <div class="modal-content glass">
-            <h2>Set a PIN</h2>
-            <input type="password" id="new-pin" maxlength="6" placeholder="Set a 4-digit PIN" />
-            <button id="set-pin-btn" class="btn-primary">Set PIN</button>
-        </div>
-    </div>
-
     <script src="./script.js"></script>
-    <!-- <script src="./conversion.js"></script> -->
     <script src="./pin.js"></script>
 </body>
 
