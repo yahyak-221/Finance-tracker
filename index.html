@@ -93,7 +93,9 @@
             <div class="transaction-history">
                 <h2>Income Transactions</h2>
                 <ul id="income-list"></ul>
-
+                <br>
+                <br>
+                <br>
                 <h2>Expense Transactions</h2>
                 <ul id="expense-list"></ul>
             </div>
@@ -117,6 +119,24 @@
             </div>
         </div>
     </div>
+
+    <div id="lock-screen" class="modal">
+        <div class="modal-content">
+            <h2>Enter PIN</h2>
+            <input type="password" id="pin-input" maxlength="6" placeholder="Enter your PIN" />
+            <button id="unlock-btn">Unlock</button>
+            <p id="pin-error" style="color: red;"></p>
+        </div>
+    </div>
+
+    <div id="set-pin-screen" class="modal hidden">
+        <div class="modal-content">
+            <h2>Set a PIN</h2>
+            <input type="password" id="new-pin" maxlength="6" placeholder="Set a 4-digit PIN" />
+            <button id="set-pin-btn">Set PIN</button>
+        </div>
+    </div>
+
 
     <script src="./script.js"></script>
     <script src="./pin.js"></script>
