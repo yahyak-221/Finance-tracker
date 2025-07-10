@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Personal Finance Tracker</title>
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" href="./pin.css" />
+    <!-- <link rel="stylesheet" href="./pin.css" /> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
@@ -23,10 +23,10 @@
 
             <!-- Summary cards -->
             <div class="cards">
-                <div class="card" id="card-income">Income: ₹0</div>
-                <div class="card" id="card-expense">Expense: ₹0</div>
-                <div class="card" id="card-net">Net: ₹0</div>
-                <div class="card" id="card-percentage">Budget used: 0%</div>
+                <div class="card" id="card-income"></div>
+                <div class="card" id="card-expense"></div>
+                <div class="card" id="card-net"></div>
+                <div class="card" id="card-percentage"></div>
             </div>
 
             <div class="budget">
@@ -148,6 +148,7 @@
 
 
     <script src="./script.js"></script>
+    <script src="./conversion.js"></script>
     <script src="./pin.js"></script>
 </body>
 

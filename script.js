@@ -36,15 +36,14 @@ function saveData() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// Format currency
+// Format display currency (no conversion)
 function formatCurrency(amount) {
   return `${currency}${Math.abs(amount).toFixed(2)}`;
 }
 
-// Add new transaction
+// Add transaction
 function addTransaction(e) {
   e.preventDefault();
-
   const text = textInput.value.trim();
   let amount = +amountInput.value.trim();
   const category = categoryInput.value;
@@ -57,7 +56,6 @@ function addTransaction(e) {
     (type === "income" || (type === "expense" && category))
   ) {
     amount = type === "expense" ? -Math.abs(amount) : Math.abs(amount);
-
     const transaction = {
       id: Date.now(),
       text,
@@ -115,7 +113,7 @@ cancelEditBtn.addEventListener("click", () => {
   editId = null;
 });
 
-// Delete transaction
+// Delete
 function removeTransaction(id) {
   if (!confirm("Are you sure you want to delete this transaction?")) return;
   transactions = transactions.filter((t) => t.id !== id);
@@ -123,7 +121,7 @@ function removeTransaction(id) {
   applyFilters();
 }
 
-// Search/Filter
+// Filter
 function applyFilters() {
   const text = searchText.value.toLowerCase();
   const category = searchCategory.value;
@@ -164,16 +162,16 @@ function render() {
     ? ((Math.abs(expense) / totalBudget) * 100).toFixed(1)
     : 0;
 
-  balanceEl.textContent = `Net: ${formatCurrency(net)}`;
   incomeEl.textContent = `Income: ${formatCurrency(income)}`;
   expenseEl.textContent = `Expense: ${formatCurrency(Math.abs(expense))}`;
+  balanceEl.textContent = `Net: ${formatCurrency(net)}`;
   percentEl.textContent = `Budget used: ${percentUsed}%`;
 
   updateChart();
   checkBudget();
 }
 
-// Chart - Category Breakdown
+// Chart
 let chart;
 function updateChart() {
   const categoryTotals = {};
@@ -213,14 +211,7 @@ function updateChart() {
     },
     options: {
       responsive: true,
-      animation: {
-        animateRotate: true,
-        animateScale: true,
-        duration: 1000,
-        easing: "easeOutQuart",
-      },
       plugins: {
-        legend: { position: "bottom" },
         tooltip: {
           callbacks: {
             label: (context) =>
@@ -229,6 +220,7 @@ function updateChart() {
               }`,
           },
         },
+        legend: { position: "bottom" },
       },
     },
   });
@@ -240,7 +232,6 @@ function checkBudget() {
   const totalExpense = transactions
     .filter((t) => t.amount < 0)
     .reduce((sum, t) => sum + t.amount, 0);
-
   const used = Math.abs(totalExpense);
   const usage = (used / budget) * 100;
 
@@ -260,12 +251,11 @@ function checkBudget() {
   }
 }
 
-// Event listeners
+// Events
 budgetInput.addEventListener("input", () => {
   localStorage.setItem("monthlyBudget", budgetInput.value);
   checkBudget();
 });
-
 const savedBudget = localStorage.getItem("monthlyBudget");
 if (savedBudget) budgetInput.value = savedBudget;
 
@@ -312,4 +302,5 @@ const sortable = new Sortable(list, {
   },
 });
 
+// Init
 applyFilters();
