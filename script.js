@@ -145,10 +145,15 @@ function render() {
   transactions.forEach((t) => {
     const el = document.createElement("li");
     el.innerHTML = `
-      ${t.text} (${t.category}) <span>${formatCurrency(t.amount)}</span>
-      <button onclick="editTransaction(${t.id})">✏️</button>
-      <button onclick="removeTransaction(${t.id})">❌</button>
-    `;
+    <div class="transaction-content">
+      ${t.text} (${t.category})
+    </div>
+    <div class="transaction-right">
+      <span>${formatCurrency(t.amount)}</span>
+      <button onclick="editTransaction(${t.id})" title="Edit">✏️</button>
+      <button onclick="removeTransaction(${t.id})" title="Delete">❌</button>
+    </div>
+  `;
 
     if (t.amount < 0) {
       expense += t.amount;
