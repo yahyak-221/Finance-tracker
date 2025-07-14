@@ -4,41 +4,44 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clean Ledger - Homepage - A Finance Tracker App!</title>
+    <title>Clean Ledger - A Finance Tracker App!</title>
+    <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <header class="nav">
-        <a href="./index.html" style="text-decoration: none; color: #1f1f1f;">
-            <h1 class="logo">Clean Ledger</h1>
-        </a>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="logo">Clean Ledger</div>
         <div class="nav-buttons">
-            <a href="login.php" class="btn">Login</a>
-            <a href="signup.php" class="btn btn-outline">Signup</a>
+            <a href="./login.php" class="btn btn-outline">Login</a>
+            <a href="./signup.php" class="btn">Sign Up</a>
         </div>
-    </header>
+    </nav>
 
-    <main class="hero">
+    <!-- Hero Section -->
+    <section class="hero">
         <div class="hero-content">
-            <h2 class="hero-title">Take Control of Your Money</h2>
+            <h1 class="hero-title">Smart Personal Finance Tracker</h1>
             <p class="hero-desc">
-                Track your income, expenses, and savings effortlessly. Visualize where your money goes and stay on top
-                of your monthly budget with real-time insights. Finance Tracker is your personal budgeting assistant —
-                smart, secure, and simple.
+                Manage your income and expenses with ease. Get clear insights through interactive charts, set budgets,
+                and stay on top of your financial goals. Now powered by a secure full-stack system with user accounts
+                and persistent data.
             </p>
             <div class="cta-buttons">
-                <a href="login.html" class="btn btn-primary">Get Started</a>
+                <a href="./signup.php" class="btn-primary">Get Started</a>
+                <a href="./login.php" class="btn-secondary">Already have an account?</a>
             </div>
         </div>
         <div class="hero-img">
-            <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Finance Illustration" />
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Finance illustration" />
         </div>
-    </main>
+    </section>
 
+    <!-- Footer -->
     <footer>
-        <p>© 2025 Clean Ledger. All rights reserved.</p>
+        &copy; 2025 Clean Ledger. All rights reserved.
     </footer>
 </body>
 
