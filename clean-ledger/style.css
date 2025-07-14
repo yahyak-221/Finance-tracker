@@ -50,18 +50,42 @@ body {
   transition: background-color var(--transition), color var(--transition);
 }
 
-#toggle-theme {
+.top-actions {
   position: fixed;
   top: 20px;
   right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.top-actions button {
   background: var(--color-card);
   color: var(--color-text);
   border: none;
   border-radius: 50px;
   padding: 10px 12px;
+  font-family: var(--font-main);
+  font-weight: 600;
   box-shadow: var(--shadow);
   cursor: pointer;
-  z-index: 1000;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.top-actions button:hover {
+  background-color: var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .top-actions {
+    top: 2vh;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    justify-content: center;
+    width: 90vw;
+  }
 }
 
 .app-container {
@@ -164,7 +188,7 @@ body {
 
 .budget-warning {
   font-weight: 600;
-  color: red;
+  color: #f44336;
 }
 
 .transaction-area {
@@ -357,6 +381,22 @@ body {
   color: white;
 }
 
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
 .modal-content .btn-primary:hover {
   opacity: 0.9;
 }
@@ -414,4 +454,21 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+form .btn-secondary {
+  background: var(--color-border);
+  color: var(--color-text);
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-muted);
+  color: white;
 }

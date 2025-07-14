@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// Redirect to home page if user not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../");
+    exit();
+}
+
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,17 +21,34 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" href="./pin.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 
 <body>
-    <button id="toggle-theme" aria-label="Toggle Dark Mode">🌙</button>
-    <div id="glass-overlay"></div>
+    <div class="top-actions">
+        <form id="logout-form" action="logout.php" method="post">
+            <button type="submit" class="btn-secondary" title="Logout">🚪</button>
+        </form>
+        <button id="toggle-theme" class="btn-secondary" aria-label="Toggle Dark Mode">🌙</button>
+        <script>
+            document.getElementById("logout-form").addEventListener("submit", function(e) {
+                if (!confirm("Are you sure you want to logout?")) {
+                    e.preventDefault();
+                }
+            });
+        </script>
+    </div>
+
+
+
+
+
+
     <div class="app-container">
         <header class="summary-header">
-            <h1 class="brand">Clean Ledger</h1>
+            <h1 class="brand">Clean Ledger - Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
+
             <div class="summary-grid">
                 <div class="summary-card income">
                     <div class="icon"><i class="fas fa-arrow-down"></i></div>
@@ -50,11 +79,13 @@
                     </div>
                 </div>
             </div>
-            <div class="budget-setter">
+            <form id="budget-form" class="budget-setter">
                 <label for="budget">Monthly Budget:</label>
                 <input type="number" id="budget" placeholder="Set your goal..." />
                 <div id="budget-warning" class="budget-warning"></div>
-            </div>
+                <button type="submit" class="btn-primary">Save Budget</button>
+            </form>
+
         </header>
 
         <main class="transaction-area">
@@ -152,26 +183,7 @@
         </div>
     </div>
 
-    <div id="lock-screen" class="modal">
-        <div class="modal-content">
-            <h2>Enter PIN</h2>
-            <input type="password" id="pin-input" maxlength="6" placeholder="Enter your PIN" />
-            <button id="unlock-btn">Unlock</button>
-            <p id="pin-error" style="color: red;"></p>
-        </div>
-    </div>
-
-    <div id="set-pin-screen" class="modal hidden">
-        <div class="modal-content">
-            <h2>Set a PIN</h2>
-            <input type="password" id="new-pin" maxlength="6" placeholder="Set a 4-digit PIN" />
-            <button id="set-pin-btn">Set PIN</button>
-        </div>
-    </div>
-
-
     <script src="./script.js"></script>
-    <script src="./pin.js"></script>
 </body>
 
 </html>

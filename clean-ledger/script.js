@@ -11,6 +11,7 @@ const netSummary = document.getElementById("net-summary");
 const percentSummary = document.getElementById("percent-summary");
 const budgetInput = document.getElementById("budget");
 const budgetWarning = document.getElementById("budget-warning");
+const budgetForm = document.getElementById("budget-form");
 const typeSelect = document.getElementById("type-select");
 const currencySelect = document.getElementById("currency-select");
 const toggleBtn = document.getElementById("toggle-theme");
@@ -22,98 +23,22 @@ const editCategory = document.getElementById("edit-category");
 const saveEditBtn = document.getElementById("save-edit");
 const cancelEditBtn = document.getElementById("cancel-edit");
 
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let transactions = [];
 let currency = localStorage.getItem("selectedCurrency") || "₹";
 currencySelect.value = currency;
 
-// Populate edit-category dropdown
 function populateEditCategories() {
   editCategory.innerHTML = categoryInput.innerHTML;
 }
 populateEditCategories();
 
-function saveData() {
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-}
-
 function formatCurrency(amount) {
   return `${currency}${Math.abs(amount).toFixed(2)}`;
 }
 
-function addTransaction(e) {
-  e.preventDefault();
-  const text = textInput.value.trim();
-  const amount = +amountInput.value.trim();
-  const type = typeSelect.value;
-  const category = type === "expense" ? categoryInput.value : "Income";
-
-  if (!text || !amount || !type || (type === "expense" && !category)) return;
-
-  const txn = {
-    id: Date.now(),
-    text,
-    amount: type === "expense" ? -Math.abs(amount) : Math.abs(amount),
-    type,
-    category,
-  };
-
-  transactions.push(txn);
-  saveData();
-  form.reset();
-  categoryInput.classList.add("hidden");
-  render();
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
 }
-
-function removeTransaction(id) {
-  if (!confirm("Are you sure you want to delete this transaction?")) return;
-  transactions = transactions.filter((t) => t.id !== id);
-  saveData();
-  render();
-}
-
-function editTransaction(id) {
-  const txn = transactions.find((t) => t.id === id);
-  if (!txn) return;
-  editText.value = txn.text;
-  editAmount.value = Math.abs(txn.amount);
-  editCategory.value = txn.category;
-  editModal.classList.remove("hidden");
-  editModal.dataset.id = id;
-}
-
-saveEditBtn.onclick = () => {
-  const id = +editModal.dataset.id;
-  const txn = transactions.find((t) => t.id === id);
-  if (!txn) return;
-  txn.text = editText.value.trim();
-  txn.amount =
-    txn.amount < 0 ? -Math.abs(+editAmount.value) : +editAmount.value;
-  txn.category = editCategory.value;
-  saveData();
-  editModal.classList.add("hidden");
-  render();
-};
-
-cancelEditBtn.onclick = () => {
-  editModal.classList.add("hidden");
-};
-
-typeSelect.onchange = () => {
-  if (typeSelect.value === "expense") {
-    categoryInput.classList.remove("hidden");
-    categoryInput.setAttribute("required", "required");
-  } else {
-    categoryInput.classList.add("hidden");
-    categoryInput.removeAttribute("required");
-    categoryInput.value = "";
-  }
-};
-
-currencySelect.onchange = () => {
-  currency = currencySelect.value;
-  localStorage.setItem("selectedCurrency", currency);
-  render();
-};
 
 toggleBtn.onclick = () => {
   document.body.classList.toggle("dark");
@@ -123,17 +48,189 @@ toggleBtn.onclick = () => {
   );
 };
 
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
+async function fetchBudget() {
+  try {
+    const res = await fetch("./get_budget.php");
+    const data = await res.json();
+    if (data.success) {
+      budgetInput.value = data.budget || "";
+      render();
+    }
+  } catch (err) {
+    console.error("Error fetching budget:", err);
+  }
 }
 
-budgetInput.oninput = () => {
-  localStorage.setItem("monthlyBudget", budgetInput.value);
+budgetForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    const budget = parseFloat(budgetInput.value);
+    const res = await fetch("./update_budget.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ budget }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      render();
+    } else {
+      console.warn("Failed to save budget");
+    }
+  } catch (err) {
+    console.error("Error saving budget:", err);
+  }
+});
+
+currencySelect.onchange = () => {
+  currency = currencySelect.value;
+  localStorage.setItem("selectedCurrency", currency);
   render();
 };
 
-const savedBudget = localStorage.getItem("monthlyBudget");
-if (savedBudget) budgetInput.value = savedBudget;
+function toggleCategoryInput(select, input) {
+  if (select.value === "expense") {
+    input.classList.remove("hidden");
+    input.setAttribute("required", "required");
+  } else {
+    input.classList.add("hidden");
+    input.removeAttribute("required");
+    input.value = "";
+  }
+}
+
+typeSelect.onchange = () => toggleCategoryInput(typeSelect, categoryInput);
+
+async function fetchTransactions() {
+  try {
+    const res = await fetch("./fetch.php");
+    const data = await res.json();
+    if (data.success) {
+      transactions = data.transactions;
+      render();
+    } else {
+      alert("Failed to fetch transactions: " + data.message);
+    }
+  } catch (err) {
+    console.error("Error fetching transactions:", err);
+  }
+}
+
+async function addTransaction(e) {
+  e.preventDefault();
+
+  const text = textInput.value.trim();
+  const amount = +amountInput.value.trim();
+  const type = typeSelect.value;
+  const category = type === "expense" ? categoryInput.value : "";
+
+  if (
+    !text ||
+    isNaN(amount) ||
+    amount <= 0 ||
+    (type === "expense" && !category)
+  ) {
+    alert("Please fill out all fields correctly.");
+    return;
+  }
+
+  try {
+    const res = await fetch("./add.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: text, amount, category, type }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      form.reset();
+      categoryInput.classList.add("hidden");
+      fetchTransactions();
+    } else {
+      alert("Failed to add transaction: " + result.message);
+    }
+  } catch (err) {
+    console.error("Error adding transaction:", err);
+  }
+}
+
+async function removeTransaction(id) {
+  if (!confirm("Are you sure you want to delete this transaction?")) return;
+
+  try {
+    const res = await fetch("./delete.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      fetchTransactions();
+    } else {
+      alert("Failed to delete: " + result.message);
+    }
+  } catch (err) {
+    console.error("Error deleting transaction:", err);
+  }
+}
+
+function editTransaction(id) {
+  const txn = transactions.find((t) => t.id === id);
+  if (!txn) return;
+
+  editText.value = txn.title;
+  editAmount.value = Math.abs(txn.amount);
+  editCategory.value = txn.category || "";
+
+  editModal.dataset.id = id;
+  editModal.dataset.type = txn.amount < 0 ? "expense" : "income";
+  toggleCategoryInput({ value: editModal.dataset.type }, editCategory);
+  editModal.classList.remove("hidden");
+}
+
+saveEditBtn.onclick = async () => {
+  const id = +editModal.dataset.id;
+  const type = editModal.dataset.type;
+  const title = editText.value.trim();
+  const amount = +editAmount.value;
+  const category = type === "expense" ? editCategory.value : "";
+
+  if (
+    !title ||
+    isNaN(amount) ||
+    amount <= 0 ||
+    (type === "expense" && !category)
+  ) {
+    alert("Please fill out all fields correctly.");
+    return;
+  }
+
+  const finalAmount = type === "expense" ? -Math.abs(amount) : Math.abs(amount);
+
+  try {
+    const res = await fetch("./edit.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, title, amount: finalAmount, category, type }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      editModal.classList.add("hidden");
+      fetchTransactions();
+    } else {
+      alert("Failed to update: " + result.message);
+    }
+  } catch (err) {
+    console.error("Error updating transaction:", err);
+  }
+};
+
+cancelEditBtn.onclick = () => {
+  editModal.classList.add("hidden");
+};
 
 function render() {
   incomeList.innerHTML = "";
@@ -145,15 +242,14 @@ function render() {
   transactions.forEach((t) => {
     const el = document.createElement("li");
     el.innerHTML = `
-    <div class="transaction-content">
-      ${t.text} (${t.category})
-    </div>
-    <div class="transaction-right">
-      <span>${formatCurrency(t.amount)}</span>
-      <button onclick="editTransaction(${t.id})" title="Edit">✏️</button>
-      <button onclick="removeTransaction(${t.id})" title="Delete">❌</button>
-    </div>
-  `;
+  <div class="transaction-content">
+    ${t.title || t.text}
+  </div>
+  <div class="transaction-right">
+    <span>${formatCurrency(t.amount)}</span>
+    <button onclick="editTransaction(${t.id})" title="Edit">✏️</button>
+    <button onclick="removeTransaction(${t.id})" title="Delete">❌</button>
+  </div>`;
 
     if (t.amount < 0) {
       expense += t.amount;
@@ -197,8 +293,8 @@ function updateChart() {
 
   transactions.forEach((t) => {
     if (t.amount < 0) {
-      categories[t.category] =
-        (categories[t.category] || 0) + Math.abs(t.amount);
+      const cat = t.category || "Uncategorized";
+      categories[cat] = (categories[cat] || 0) + Math.abs(t.amount);
     }
   });
 
@@ -242,6 +338,8 @@ function updateChart() {
 }
 
 form.addEventListener("submit", addTransaction);
+fetchTransactions();
+fetchBudget();
 
 new Sortable(incomeList, {
   onEnd: (evt) => {
@@ -250,7 +348,6 @@ new Sortable(incomeList, {
     const moved = incomeTxns.splice(evt.oldIndex, 1)[0];
     incomeTxns.splice(evt.newIndex, 0, moved);
     transactions = [...incomeTxns, ...expenseTxns];
-    saveData();
     render();
   },
 });
@@ -262,9 +359,6 @@ new Sortable(expenseList, {
     const moved = expenseTxns.splice(evt.oldIndex, 1)[0];
     expenseTxns.splice(evt.newIndex, 0, moved);
     transactions = [...incomeTxns, ...expenseTxns];
-    saveData();
     render();
   },
 });
-
-render();

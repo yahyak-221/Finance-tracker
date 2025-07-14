@@ -2,20 +2,31 @@
 require 'db.php';
 session_start();
 
+$toastMessage = ""; // To trigger toast in JS
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user["password"])) {
-        $_SESSION["user_id"] = $user["id"];
-        header("Location: ./clean-ledger/"); // Replace with your app's main page
-        exit();
+    if ($stmt->rowCount() > 0) {
+        $toastMessage = "User already exists.";
     } else {
-        echo "<p style='color:red; font-family:Inter,sans-serif;'>Invalid email or password.</p>";
+        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        if ($stmt->execute([$username, $email, $hashedPassword])) {
+            $toastMessage = "Signup successful. Redirecting to login...";
+            echo "<script>
+                    setTimeout(() => {
+                        window.location.href = 'login.php';
+                    }, 3000);
+                  </script>";
+        } else {
+            $toastMessage = "Signup failed. Please try again.";
+        }
     }
 }
 ?>
@@ -29,10 +40,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Login - Clean Ledger</title>
     <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 </head>
 
-<body style="margin: 0; padding: 0; background-color: #f9f9fb; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh;">
+<body style="
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9fb;
+  color: #111;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+">
+    <!-- 🌗 Toggle Button -->
+    <button id="toggle-theme" aria-label="Toggle Dark Mode" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    color: #111;
+    border: none;
+    border-radius: 50%;
+    padding: 10px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    z-index: 1000;
+  ">🌙</button>
 
+    <!-- Login Form -->
     <form method="post" action="login.php" style="
     background-color: #fff;
     padding: 40px;
@@ -40,8 +83,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
     width: 100%;
     max-width: 400px;
+    transition: background-color 0.4s ease, color 0.4s ease;
   ">
-        <h2 style="margin-bottom: 24px; color: #111; text-align: center;">Clean Ledger - Login</h2>
+        <h2 id="form-title" style="margin-bottom: 24px; text-align: center;">Clean Ledger - Login</h2>
 
         <input type="email" name="email" placeholder="Email" required style="
       width: 100%;
@@ -52,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       font-size: 15px;
       background-color: #fff;
       color: #111;
+      transition: background-color 0.4s ease, color 0.4s ease;
     ">
 
         <input type="password" name="password" placeholder="Password" required style="
@@ -63,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       font-size: 15px;
       background-color: #fff;
       color: #111;
+      transition: background-color 0.4s ease, color 0.4s ease;
     ">
 
         <button type="submit" style="
@@ -86,6 +132,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </p>
     </form>
 
+    <script>
+        const toggleBtn = document.getElementById("toggle-theme");
+        const body = document.body;
+        const form = document.querySelector("form");
+        const inputs = document.querySelectorAll("input");
+        const title = document.getElementById("form-title");
+
+        // Apply saved theme from localStorage
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") applyDarkMode(true);
+
+        toggleBtn.addEventListener("click", () => {
+            const isDark = body.classList.toggle("dark");
+            applyDarkMode(isDark);
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+
+        function applyDarkMode(isDark) {
+            body.style.backgroundColor = isDark ? "#121212" : "#f9f9fb";
+            body.style.color = isDark ? "#f5f5f5" : "#111";
+
+            form.style.backgroundColor = isDark ? "#1f1f1f" : "#fff";
+            form.style.color = isDark ? "#f5f5f5" : "#111";
+            title.style.color = isDark ? "#f5f5f5" : "#111";
+
+            inputs.forEach(input => {
+                input.style.backgroundColor = isDark ? "#2a2a2a" : "#fff";
+                input.style.color = isDark ? "#f5f5f5" : "#111";
+            });
+
+            toggleBtn.textContent = isDark ? "☀️" : "🌙";
+            toggleBtn.style.background = isDark ? "#2a2a2a" : "#fff";
+            toggleBtn.style.color = isDark ? "#f5f5f5" : "#111";
+        }
+    </script>
 </body>
 
 </html>

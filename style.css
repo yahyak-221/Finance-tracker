@@ -15,6 +15,66 @@ body {
   color: var(--text);
   margin: 0;
   padding: 0;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.nav,
+.hero,
+.cta-buttons a,
+.btn,
+footer {
+  transition: background-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Dark Theme Overrides */
+body.dark {
+  --bg: #121212;
+  --text: #f5f5f5;
+  --card: #111111;
+  --border: #333;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Toggle Button */
+#toggle-theme {
+  background: var(--card);
+  color: var(--text);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+#toggle-theme:hover {
+  background-color: var(--border);
+}
+
+.hero,
+.nav,
+.cta-buttons a,
+footer {
+  background-color: var(--card);
+  color: var(--text);
+}
+
+.nav-buttons .btn,
+.cta-buttons a {
+  color: var(--text);
+  background-color: var(--primary);
+}
+
+#toggle-theme {
+  transition: background 0.5s ease, color 0.5s ease, transform 0.3s ease-in-out;
+}
+
+#toggle-theme.rotate {
+  transform: rotate(360deg);
 }
 
 .nav {

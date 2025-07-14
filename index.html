@@ -15,10 +15,12 @@
     <nav class="nav">
         <div class="logo">Clean Ledger</div>
         <div class="nav-buttons">
+            <button id="toggle-theme" aria-label="Toggle Dark Mode">🌙</button>
             <a href="./login.php" class="btn btn-outline">Login</a>
             <a href="./signup.php" class="btn">Sign Up</a>
         </div>
     </nav>
+
 
     <!-- Hero Section -->
     <section class="hero">
@@ -43,6 +45,28 @@
     <footer>
         &copy; 2025 Clean Ledger. All rights reserved.
     </footer>
+
+    <script>
+        const toggleBtn = document.getElementById("toggle-theme");
+
+        // Check localStorage for saved theme and apply it
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+            toggleBtn.textContent = "☀️";
+        } else {
+            toggleBtn.textContent = "🌙";
+        }
+
+        // Toggle theme on click and update localStorage
+        toggleBtn.addEventListener("click", () => {
+            const isDark = document.body.classList.toggle("dark");
+            toggleBtn.textContent = isDark ? "☀️" : "🌙";
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+
+    </script>
+
+
 </body>
 
 </html>
