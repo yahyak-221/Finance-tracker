@@ -60,11 +60,41 @@
             <form id="transaction-form" class="transaction-form">
                 <input type="text" id="text" placeholder="Description" required />
                 <input type="number" id="amount" placeholder="Amount" required />
-                <select id="type-select" required>
-                    <option value="">Transaction Type</option>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                </select>
+                <div class="custom-dropdown" id="type-dropdown">
+                    <div class="selected" id="type-selected">Transaction Type</div>
+                    <ul class="dropdown-list hidden">
+                        <li data-value="income">Income</li>
+                        <li data-value="expense">Expense</li>
+                    </ul>
+                </div>
+                <input type="hidden" id="type-select" name="type" required>
+                <script>
+                    const customDropdown = document.getElementById("type-dropdown");
+                    const selected = document.getElementById("type-selected");
+                    const dropdownList = customDropdown.querySelector(".dropdown-list");
+                    const hiddenInput = document.getElementById("type-select");
+
+                    selected.addEventListener("click", () => {
+                        dropdownList.classList.toggle("hidden");
+                    });
+
+                    dropdownList.querySelectorAll("li").forEach((item) => {
+                        item.addEventListener("click", () => {
+                            selected.textContent = item.textContent;
+                            hiddenInput.value = item.dataset.value;
+                            dropdownList.classList.add("hidden");
+                            // Trigger the onchange event manually (for category toggle)
+                            hiddenInput.dispatchEvent(new Event("change"));
+                        });
+                    });
+
+                    // Close if clicked outside
+                    document.addEventListener("click", (e) => {
+                        if (!customDropdown.contains(e.target)) {
+                            dropdownList.classList.add("hidden");
+                        }
+                    });
+                </script>
                 <select id="category" class="hidden">
                     <option value="">Select Category</option>
                     <option value="Books">Books</option>
