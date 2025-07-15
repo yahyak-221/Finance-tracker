@@ -23,26 +23,67 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
     <link rel="stylesheet" href="./style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="./clean-ledger-toast.js"></script>
+
 </head>
 
 <body>
     <div class="top-actions">
         <form id="logout-form" action="logout.php" method="post">
-            <button type="submit" class="btn-secondary" title="Logout">🚪</button>
+            <button type="button" id="logout-btn" class="btn-secondary" title="Logout">🚪</button>
         </form>
         <button id="toggle-theme" class="btn-secondary" aria-label="Toggle Dark Mode">🌙</button>
+    </div>
+
+    <!-- 🔒 Logout Confirmation Modal -->
+    <div id="logout-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-actions">
+                <button id="confirm-logout" class="btn-primary">Yes, Logout</button>
+                <button id="cancel-logout" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
         <script>
-            document.getElementById("logout-form").addEventListener("submit", function(e) {
-                if (!confirm("Are you sure you want to logout?")) {
-                    e.preventDefault();
+            document.addEventListener("DOMContentLoaded", () => {
+                const logoutBtn = document.getElementById("logout-btn");
+                const logoutForm = document.getElementById("logout-form");
+                const logoutModal = document.getElementById("logout-modal");
+                const confirmLogout = document.getElementById("confirm-logout");
+                const cancelLogout = document.getElementById("cancel-logout");
+                const modalContent = logoutModal.querySelector(".modal-content");
+
+                logoutBtn.addEventListener("click", () => {
+                    logoutModal.classList.remove("hidden", "fade-out");
+                    modalContent.classList.remove("fade-out");
+                    logoutModal.classList.add("fade-in");
+                });
+
+                confirmLogout.addEventListener("click", () => {
+                    logoutForm.submit();
+                });
+
+                cancelLogout.addEventListener("click", closeModal);
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") closeModal();
+                });
+
+                function closeModal() {
+                    logoutModal.classList.remove("fade-in");
+                    logoutModal.classList.add("fade-out");
+                    modalContent.classList.add("fade-out");
+
+                    setTimeout(() => {
+                        logoutModal.classList.add("hidden");
+                        modalContent.classList.remove("fade-out");
+                    }, 300);
                 }
             });
         </script>
     </div>
-
-
-
-
 
 
     <div class="app-container">

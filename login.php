@@ -2,35 +2,30 @@
 require 'db.php';
 session_start();
 
-$toastMessage = ""; // To trigger toast in JS
+$toastMessage = "";
+$toastType = ""; // "success" or "error"
+$jsRedirect = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = trim($_POST["username"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE email = ?");
     $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($stmt->rowCount() > 0) {
-        $toastMessage = "User already exists.";
+    if ($user && password_verify($password, $user["password"])) {
+        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["username"] = $user["username"];
+        $toastMessage = "Login successful! Welcome, {$user["username"]}";
+        $toastType = "success";
+        $jsRedirect = "setTimeout(() => window.location.href='./clean-ledger/', 2000);";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        if ($stmt->execute([$username, $email, $hashedPassword])) {
-            $toastMessage = "Signup successful. Redirecting to login...";
-            echo "<script>
-                    setTimeout(() => {
-                        window.location.href = 'login.php';
-                    }, 3000);
-                  </script>";
-        } else {
-            $toastMessage = "Signup failed. Please try again.";
-        }
+        $toastMessage = "Invalid email or password.";
+        $toastType = "error";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,9 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Login - Clean Ledger</title>
     <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 </head>
 
 <body style="
@@ -132,6 +125,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </p>
     </form>
 
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script>
         const toggleBtn = document.getElementById("toggle-theme");
         const body = document.body;
@@ -139,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         const inputs = document.querySelectorAll("input");
         const title = document.getElementById("form-title");
 
-        // Apply saved theme from localStorage
+        // Apply saved theme
         const savedTheme = localStorage.getItem("theme");
         if (savedTheme === "dark") applyDarkMode(true);
 
@@ -152,20 +147,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         function applyDarkMode(isDark) {
             body.style.backgroundColor = isDark ? "#121212" : "#f9f9fb";
             body.style.color = isDark ? "#f5f5f5" : "#111";
-
             form.style.backgroundColor = isDark ? "#1f1f1f" : "#fff";
             form.style.color = isDark ? "#f5f5f5" : "#111";
             title.style.color = isDark ? "#f5f5f5" : "#111";
+            toggleBtn.textContent = isDark ? "☀️" : "🌙";
+            toggleBtn.style.background = isDark ? "#2a2a2a" : "#fff";
+            toggleBtn.style.color = isDark ? "#f5f5f5" : "#111";
 
             inputs.forEach(input => {
                 input.style.backgroundColor = isDark ? "#2a2a2a" : "#fff";
                 input.style.color = isDark ? "#f5f5f5" : "#111";
             });
-
-            toggleBtn.textContent = isDark ? "☀️" : "🌙";
-            toggleBtn.style.background = isDark ? "#2a2a2a" : "#fff";
-            toggleBtn.style.color = isDark ? "#f5f5f5" : "#111";
         }
+
+        const toastMessage = <?= json_encode($toastMessage) ?>;
+        const toastType = <?= json_encode($toastType) ?>;
+
+        if (toastMessage) {
+            Toastify({
+                text: toastMessage,
+                duration: 3000,
+                gravity: "bottom",
+                position: "left",
+                backgroundColor: toastType === "success" ? "#28a745" : "#dc3545",
+                stopOnFocus: true,
+                close: true,
+                style: {
+                    fontFamily: "Inter, sans-serif",
+                    borderRadius: "8px",
+                    fontSize: "14px"
+                }
+            }).showToast();
+        }
+
+        <?= $jsRedirect ?>
     </script>
 </body>
 

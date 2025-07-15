@@ -2,29 +2,33 @@
 require 'db.php';
 session_start();
 
+$toastMessage = "";
+$toastType = ""; // "success" or "error"
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = trim($_POST["username"]); // ✅ Add this
+    $username = trim($_POST["username"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    // Check if user already exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
 
     if ($stmt->rowCount() > 0) {
-        echo "<p style='color:red; font-family:Inter,sans-serif;'>User already exists.</p>";
+        $toastMessage = "User already exists.";
+        $toastType = "error";
     } else {
-        // ✅ Insert username too
         $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
         if ($stmt->execute([$username, $email, $hashedPassword])) {
-            echo "<p style='color:green; font-family:Inter,sans-serif;'>Signup successful. <a href='login.php' style='color:#007aff;'>Login here</a>.</p>";
+            $toastMessage = "Signup successful. Redirecting to login...";
+            $toastType = "success";
+            echo "<script>setTimeout(() => window.location.href='login.php', 3000);</script>";
         } else {
-            echo "<p style='color:red; font-family:Inter,sans-serif;'>Signup failed. Please try again.</p>";
+            $toastMessage = "Signup failed. Please try again.";
+            $toastType = "error";
         }
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Signup - Clean Ledger</title>
     <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body style="
@@ -51,82 +56,82 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ">
     <!-- 🌗 Toggle Button -->
     <button id="toggle-theme" aria-label="Toggle Dark Mode" style="
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #fff;
-      color: #111;
-      border: none;
-      border-radius: 50%;
-      padding: 10px 12px;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: background-color 0.4s ease, color 0.4s ease;
-      z-index: 1000;
-    ">🌙</button>
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    color: #111;
+    border: none;
+    border-radius: 50%;
+    padding: 10px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    z-index: 1000;
+  ">🌙</button>
 
     <!-- Sign Up Form -->
     <form method="post" action="signup.php" style="
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 400px;
-      transition: background-color 0.4s ease, color 0.4s ease;
-    ">
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  ">
         <h2 id="form-title" style="margin-bottom: 24px; text-align: center;">Clean Ledger - Sign Up</h2>
 
         <input type="text" name="username" placeholder="Username" required style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          margin-bottom: 16px;
-          font-size: 15px;
-          background-color: #fff;
-          color: #111;
-          transition: background-color 0.4s ease, color 0.4s ease;
-        ">
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 15px;
+      background-color: #fff;
+      color: #111;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    ">
 
         <input type="email" name="email" placeholder="Email" required style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          margin-bottom: 16px;
-          font-size: 15px;
-          background-color: #fff;
-          color: #111;
-          transition: background-color 0.4s ease, color 0.4s ease;
-        ">
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 15px;
+      background-color: #fff;
+      color: #111;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    ">
 
         <input type="password" name="password" placeholder="Password" required style="
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          margin-bottom: 24px;
-          font-size: 15px;
-          background-color: #fff;
-          color: #111;
-          transition: background-color 0.4s ease, color 0.4s ease;
-        ">
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      background-color: #fff;
+      color: #111;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    ">
 
         <button type="submit" style="
-          width: 100%;
-          padding: 12px;
-          background-color: #007aff;
-          color: white;
-          border: none;
-          border-radius: 12px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-        ">Sign Up</button>
+      width: 100%;
+      padding: 12px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    ">Sign Up</button>
 
         <p style="text-align: center; margin-top: 16px; font-size: 14px; color: #555;">
             Already have an account? <a href="login.php" style="color: #007aff; text-decoration: none;">Login</a>
@@ -135,6 +140,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             Go <a href="./" style="color: #007aff; text-decoration: none;">Home</a>
         </p>
     </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <!-- 🌙 Dark Mode Script with LocalStorage -->
     <script>
@@ -157,19 +164,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         function applyDarkMode(isDark) {
             body.style.backgroundColor = isDark ? "#121212" : "#f9f9fb";
             body.style.color = isDark ? "#f5f5f5" : "#111";
-
             form.style.backgroundColor = isDark ? "#1f1f1f" : "#fff";
             form.style.color = isDark ? "#f5f5f5" : "#111";
             title.style.color = isDark ? "#f5f5f5" : "#111";
+            toggleBtn.textContent = isDark ? "☀️" : "🌙";
+            toggleBtn.style.background = isDark ? "#2a2a2a" : "#fff";
+            toggleBtn.style.color = isDark ? "#f5f5f5" : "#111";
 
             inputs.forEach(input => {
                 input.style.backgroundColor = isDark ? "#2a2a2a" : "#fff";
                 input.style.color = isDark ? "#f5f5f5" : "#111";
             });
+        }
 
-            toggleBtn.textContent = isDark ? "☀️" : "🌙";
-            toggleBtn.style.background = isDark ? "#2a2a2a" : "#fff";
-            toggleBtn.style.color = isDark ? "#f5f5f5" : "#111";
+        // ✅ Toast Message
+        const toastMessage = <?= json_encode($toastMessage) ?>;
+        const toastType = <?= json_encode($toastType) ?>;
+        if (toastMessage) {
+            Toastify({
+                text: toastMessage,
+                duration: 3000,
+                gravity: "bottom",
+                position: "left",
+                backgroundColor: toastType === "success" ? "#28a745" : "#dc3545",
+                stopOnFocus: true,
+                close: true,
+                style: {
+                    fontFamily: "Inter, sans-serif",
+                    borderRadius: "8px",
+                    fontSize: "14px"
+                }
+            }).showToast();
         }
     </script>
 </body>
