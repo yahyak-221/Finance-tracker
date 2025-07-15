@@ -117,6 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       transition: background-color 0.3s ease;
     ">Login</button>
 
+        <!-- hello this is login page -->
+
         <p style="text-align: center; margin-top: 16px; font-size: 14px; color: #555;">
             Don't have an account? <a href="signup.php" style="color: #007aff; text-decoration: none;">Sign up</a>
         </p>
