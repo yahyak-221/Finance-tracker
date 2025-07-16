@@ -1,63 +1,73 @@
 # 💰 Clean Ledger - A Simple Finance Tracker
 
-**Clean Ledger** is a modern and lightweight full-stack finance tracker that helps you manage your income, expenses, and budget — beautifully.
-
-It includes user authentication, transaction categorization, budget tracking, and supports both light and dark themes with smooth UI interactions and toast notifications.
+**Clean Ledger** is a modern, lightweight, full-stack finance tracker built to help users efficiently manage their income, expenses, and monthly budgets. With a sleek UI, secure backend, and real-time data handling, it provides everything you need to stay financially organized.
 
 ---
 
 ## 🚀 Features
 
-1. **Authentication System**
+### 🔐 Authentication System
 
-   - Secure login/signup with hashed passwords using PHP + MySQL (via PDO).
-   - Session-based authentication.
+- Secure login and signup with hashed passwords using **PHP + MySQL (PDO)**.
+- Session-based authentication with automatic redirection on logout or unauthorized access.
 
-2. **Budget Management**
+### 💵 Budget Management
 
-   - Set your monthly budget.
-   - Real-time summary of your spending vs budget.
+- Set a custom monthly budget.
+- Visual feedback on how much you've spent vs. remaining budget.
+- Dynamic budget updates saved directly to the database.
 
-3. **Transaction Tracker**
+### 📊 Transaction Tracker
 
-   - Add income or expense with categories.
-   - Fully editable and deletable entries.
-   - Automatic transaction sorting and display.
+- Add, edit, or delete income and expense entries.
+- Supports categories for easier filtering and analysis.
+- Real-time balance and sorting functionality.
 
-4. **Visual Insights**
+### 📈 Visual Insights
 
-   - Dynamic pie chart using Chart.js to show spending breakdown.
-   - Live net savings and percentage used.
+- Dynamic **Chart.js** pie chart to visualize category-wise spending.
+- Displays savings, total income, and total expenses dynamically.
 
-5. **User Interface**
+### 🧑‍🎨 User Interface
 
-   - Responsive design using modern CSS with Inter font.
-   - Smooth theme toggle (light/dark) using localStorage.
-   - Custom dropdowns and modal windows.
-   - Toast notifications for success/error (via Toastify.js).
+- Responsive and clean UI with **Inter font**.
+- Supports **light/dark theme** toggle via `localStorage`.
+- Animated dropdowns, modals, and transitions for a smooth UX.
+- **Toastify.js**-based toast notifications for actions like adding, editing, or saving.
 
-6. **Technology Stack**
-   - **Frontend:** HTML, CSS, JS, Toastify.js, Chart.js
-   - **Backend:** PHP (PDO) + MySQL
-   - **Data Persistence:** MySQL DB (Transactions, Users)
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** HTML, CSS, JavaScript, Chart.js, Toastify.js
+- **Backend:** PHP (PDO) + MySQL
+- **Database:** MySQL with tables for users, transactions, and budget
 
 ---
 
 ## 📁 Project Structure
 
-clean-ledger/
-├── assets/ # Images, icons, favicon
-├── clean-ledger/ # Core finance tracker
+├── CLEANLEDGER/
+│ ├── assets/
+│ │ ├── clean-ledger/
+│ │ │ ├── add.php
+│ │ │ ├── clean-ledger-toast.js
+│ │ │ ├── conversion.js
+│ │ │ ├── db.php
+│ │ │ ├── delete.php
+│ │ │ ├── edit.php
+│ │ │ ├── fetch.php
+│ │ │ ├── get_budget.php
+│ │ │ ├── index.php
+│ │ │ ├── logout.php
+│ │ │ ├── script.js
+│ │ │ ├── style.css
+│ │ │ └── update_budget.php
+│ │ └── img/
+│ ├── 1hahahah.php
+│ ├── dp.php
 │ ├── index.html
-│ ├── script.js
-│ ├── style.css
-│ ├── toast.js
-│ ├── fetch.php
-│ ├── add.php
-│ ├── edit.php
-│ └── delete.php
-├── login.php
-├── signup.php
-├── logout.php
-├── db.php
-└── README.md
+│ ├── login.php
+│ ├── README.md
+│ ├── signup.php
+│ └── style.css
