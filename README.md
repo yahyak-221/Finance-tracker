@@ -1,73 +1,78 @@
 # 💰 Clean Ledger - A Simple Finance Tracker
 
-**Clean Ledger** is a modern, lightweight, full-stack finance tracker built to help users efficiently manage their income, expenses, and monthly budgets. With a sleek UI, secure backend, and real-time data handling, it provides everything you need to stay financially organized.
+**Clean Ledger** is a modern, lightweight full-stack finance tracker that helps users manage income, expenses, and monthly budgets with a clean UI, secure backend, and real-time updates.
 
 ---
 
 ## 🚀 Features
 
-### 🔐 Authentication System
-
-- Secure login and signup with hashed passwords using **PHP + MySQL (PDO)**.
-- Session-based authentication with automatic redirection on logout or unauthorized access.
-
-### 💵 Budget Management
-
-- Set a custom monthly budget.
-- Visual feedback on how much you've spent vs. remaining budget.
-- Dynamic budget updates saved directly to the database.
-
-### 📊 Transaction Tracker
-
-- Add, edit, or delete income and expense entries.
-- Supports categories for easier filtering and analysis.
-- Real-time balance and sorting functionality.
-
-### 📈 Visual Insights
-
-- Dynamic **Chart.js** pie chart to visualize category-wise spending.
-- Displays savings, total income, and total expenses dynamically.
-
-### 🧑‍🎨 User Interface
-
-- Responsive and clean UI with **Inter font**.
-- Supports **light/dark theme** toggle via `localStorage`.
-- Animated dropdowns, modals, and transitions for a smooth UX.
-- **Toastify.js**-based toast notifications for actions like adding, editing, or saving.
-
----
-
-## 🛠️ Technology Stack
-
-- **Frontend:** HTML, CSS, JavaScript, Chart.js, Toastify.js
-- **Backend:** PHP (PDO) + MySQL
-- **Database:** MySQL with tables for users, transactions, and budget
+- Secure login/signup using PHP (PDO) + MySQL
+- Session-based user authentication
+- Add/edit/delete income & expenses
+- Monthly budget tracking with savings visualization
+- Dynamic charts for spending breakdown (Chart.js)
+- Responsive light/dark theme toggle
+- Toast notifications (Toastify.js)
 
 ---
 
 ## 📁 Project Structure
 
-├── CLEANLEDGER/
-│ ├── assets/
-│ │ ├── clean-ledger/
-│ │ │ ├── add.php
-│ │ │ ├── clean-ledger-toast.js
-│ │ │ ├── conversion.js
-│ │ │ ├── db.php
-│ │ │ ├── delete.php
-│ │ │ ├── edit.php
-│ │ │ ├── fetch.php
-│ │ │ ├── get_budget.php
-│ │ │ ├── index.php
-│ │ │ ├── logout.php
-│ │ │ ├── script.js
-│ │ │ ├── style.css
-│ │ │ └── update_budget.php
-│ │ └── img/
-│ ├── 1hahahah.php
-│ ├── dp.php
-│ ├── index.html
-│ ├── login.php
-│ ├── README.md
-│ ├── signup.php
-│ └── style.css
+```
+CLEANLEDGER/
+├── assets/
+│   ├── clean-ledger/
+│   │   ├── add.php
+│   │   ├── clean-ledger-toast.js
+│   │   ├── conversion.js
+│   │   ├── db.php
+│   │   ├── delete.php
+│   │   ├── edit.php
+│   │   ├── fetch.php
+│   │   ├── get_budget.php
+│   │   ├── index.php
+│   │   ├── logout.php
+│   │   ├── script.js
+│   │   ├── style.css
+│   │   └── update_budget.php
+│   └── img/
+├── 1hahahah.php
+├── dp.php
+├── index.html
+├── login.php
+├── README.md
+├── signup.php
+└── style.css
+```
+
+---
+
+## ⚙️ Tech Stack
+
+- **Frontend**: HTML, CSS, JavaScript, Toastify.js, Chart.js
+- **Backend**: PHP (PDO)
+- **Database**: MySQL
+
+---
+
+## 🧪 How to Run
+
+1. Set up a MySQL database and import the required tables.
+2. Update your DB credentials inside `db.php`.
+3. Serve the project using a PHP server (e.g., XAMPP, WAMP, or `php -S`).
+4. Open `index.html` in your browser to get started.
+
+---
+
+## ✅ Status
+
+🎯 Functional with full CRUD features for transactions and budget.  
+📦 Ready for enhancements like export, filtering, and user profile settings.
+
+---
+
+## 📄 License
+
+MIT License. Feel free to use, modify, and share.
+
+---
