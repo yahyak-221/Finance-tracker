@@ -136,9 +136,7 @@ async function addTransaction(e) {
   try {
     const res = await fetch("./add.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: text, amount, category, type }),
     });
 
@@ -177,8 +175,19 @@ async function removeTransaction(id) {
 }
 
 function editTransaction(id) {
+  console.log("Inside editTransaction function. ID received:", id);
   const txn = transactions.find((t) => t.id === id);
-  if (!txn) return;
+
+  if (!txn) {
+    console.warn(
+      "Transaction with ID",
+      id,
+      "not found in 'transactions' array."
+    );
+    return;
+  }
+
+  console.log("Found transaction:", txn);
 
   editText.value = txn.title;
   editAmount.value = Math.abs(txn.amount);
@@ -186,8 +195,28 @@ function editTransaction(id) {
 
   editModal.dataset.id = id;
   editModal.dataset.type = txn.amount < 0 ? "expense" : "income";
+
+  console.log("Transaction type for modal:", editModal.dataset.type);
   toggleCategoryInput({ value: editModal.dataset.type }, editCategory);
+
+  console.log("Attempting to show edit modal...");
+
+  // *** THE FIX IS HERE ***
+  // 1. Ensure 'hidden' is removed first to make it display: block;
   editModal.classList.remove("hidden");
+  // 2. Remove 'fade-out' if it was lingering from a previous closing
+  editModal.classList.remove("fade-out");
+  // 3. Add 'fade-in' to start the opacity transition and enable pointer events
+  editModal.classList.add("fade-in");
+
+  // For the modal content animation, ensure it also gets the transform
+  const modalContent = editModal.querySelector(".modal-content");
+  if (modalContent) {
+    modalContent.classList.remove("fade-out"); // Remove if it was set on closing
+    modalContent.classList.add("fade-in"); // Add if you have a fade-in for content (optional, but good for consistency)
+  }
+  // If you don't have a separate .modal-content.fade-in, you can remove the modalContent related lines above.
+  // The current CSS for .modal.fade-in .modal-content handles the transform.
 }
 
 saveEditBtn.onclick = async () => {
@@ -240,23 +269,27 @@ function render() {
   let expense = 0;
 
   transactions.forEach((t) => {
-    const el = document.createElement("li");
-    el.innerHTML = `
-  <div class="transaction-content">
-    ${t.title || t.text}
-  </div>
-  <div class="transaction-right">
-    <span>${formatCurrency(t.amount)}</span>
-    <button onclick="editTransaction(${t.id})" title="Edit">✏️</button>
-    <button onclick="removeTransaction(${t.id})" title="Delete">❌</button>
-  </div>`;
+    const li = document.createElement("li");
+    li.dataset.id = t.id;
+    li.className = "transaction-item";
+
+    li.innerHTML = `
+      <div class="transaction-left">
+        <span class="transaction-title">${t.title}</span>
+      </div>
+      <div class="transaction-right">
+        <span class="transaction-amount">${formatCurrency(t.amount)}</span>
+        <button class="edit-btn" title="Edit">✏️</button>
+        <button class="delete-btn" title="Delete">❌</button>
+      </div>
+    `;
 
     if (t.amount < 0) {
       expense += t.amount;
-      expenseList.appendChild(el);
+      expenseList.appendChild(li);
     } else {
       income += t.amount;
-      incomeList.appendChild(el);
+      incomeList.appendChild(li);
     }
   });
 
@@ -328,8 +361,7 @@ function updateChart() {
         legend: { position: "bottom" },
         tooltip: {
           callbacks: {
-            label: (context) =>
-              `${context.label}: ${currency}${context.formattedValue}`,
+            label: (ctx) => `${ctx.label}: ${currency}${ctx.formattedValue}`,
           },
         },
       },
@@ -337,28 +369,23 @@ function updateChart() {
   });
 }
 
+// 🧠 Delegated event handling for edit/delete
+[incomeList, expenseList].forEach((list) => {
+  list.addEventListener("click", (e) => {
+    const li = e.target.closest("li");
+    if (!li) return;
+    const id = +li.dataset.id;
+
+    if (e.target.classList.contains("edit-btn")) {
+      console.log("Edit button clicked for transaction ID:", id);
+      editTransaction(id);
+    } else if (e.target.classList.contains("delete-btn")) {
+      removeTransaction(id);
+    }
+  });
+});
+
+// Init
 form.addEventListener("submit", addTransaction);
 fetchTransactions();
 fetchBudget();
-
-new Sortable(incomeList, {
-  onEnd: (evt) => {
-    const incomeTxns = transactions.filter((t) => t.amount >= 0);
-    const expenseTxns = transactions.filter((t) => t.amount < 0);
-    const moved = incomeTxns.splice(evt.oldIndex, 1)[0];
-    incomeTxns.splice(evt.newIndex, 0, moved);
-    transactions = [...incomeTxns, ...expenseTxns];
-    render();
-  },
-});
-
-new Sortable(expenseList, {
-  onEnd: (evt) => {
-    const incomeTxns = transactions.filter((t) => t.amount >= 0);
-    const expenseTxns = transactions.filter((t) => t.amount < 0);
-    const moved = expenseTxns.splice(evt.oldIndex, 1)[0];
-    expenseTxns.splice(evt.newIndex, 0, moved);
-    transactions = [...incomeTxns, ...expenseTxns];
-    render();
-  },
-});

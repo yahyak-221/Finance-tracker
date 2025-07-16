@@ -3,7 +3,7 @@ require 'db.php';
 session_start();
 
 $toastMessage = "";
-$toastType = ""; // "success" or "error"
+$toastType = "";
 $jsRedirect = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -50,7 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   height: 100vh;
   transition: background-color 0.4s ease, color 0.4s ease;
 ">
-    <!-- 🌗 Toggle Button -->
     <button id="toggle-theme" aria-label="Toggle Dark Mode" style="
     position: fixed;
     top: 20px;
@@ -68,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     z-index: 1000;
   ">🌙</button>
 
-    <!-- Login Form -->
     <form method="post" action="login.php" style="
     background-color: #fff;
     padding: 40px;
@@ -117,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       transition: background-color 0.3s ease;
     ">Login</button>
 
-        <!-- hello this is login page -->
 
         <p style="text-align: center; margin-top: 16px; font-size: 14px; color: #555;">
             Don't have an account? <a href="signup.php" style="color: #007aff; text-decoration: none;">Sign up</a>
@@ -136,7 +133,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         const inputs = document.querySelectorAll("input");
         const title = document.getElementById("form-title");
 
-        // Apply saved theme
         const savedTheme = localStorage.getItem("theme");
         if (savedTheme === "dark") applyDarkMode(true);
 

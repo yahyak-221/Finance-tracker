@@ -11,7 +11,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="nav">
         <div class="logo">Clean Ledger</div>
         <div class="nav-buttons">
@@ -22,7 +21,6 @@
     </nav>
 
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <h1 class="hero-title">Smart Personal Finance Tracker</h1>
@@ -41,7 +39,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         &copy; 2025 Clean Ledger. All rights reserved.
     </footer>
@@ -49,7 +46,6 @@
     <script>
         const toggleBtn = document.getElementById("toggle-theme");
 
-        // Check localStorage for saved theme and apply it
         if (localStorage.getItem("theme") === "dark") {
             document.body.classList.add("dark");
             toggleBtn.textContent = "☀️";
@@ -57,7 +53,6 @@
             toggleBtn.textContent = "🌙";
         }
 
-        // Toggle theme on click and update localStorage
         toggleBtn.addEventListener("click", () => {
             const isDark = document.body.classList.toggle("dark");
             toggleBtn.textContent = isDark ? "☀️" : "🌙";

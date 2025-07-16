@@ -3,7 +3,7 @@ require 'db.php';
 session_start();
 
 $toastMessage = "";
-$toastType = ""; // "success" or "error"
+$toastType = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST["username"]);
@@ -54,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   height: 100vh;
   transition: background-color 0.4s ease, color 0.4s ease;
 ">
-    <!-- 🌗 Toggle Button -->
     <button id="toggle-theme" aria-label="Toggle Dark Mode" style="
     position: fixed;
     top: 20px;
@@ -72,7 +71,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     z-index: 1000;
   ">🌙</button>
 
-    <!-- Sign Up Form -->
     <form method="post" action="signup.php" style="
     background-color: #fff;
     padding: 40px;
@@ -143,7 +141,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- 🌙 Dark Mode Script with LocalStorage -->
     <script>
         const toggleBtn = document.getElementById("toggle-theme");
         const body = document.body;
@@ -151,7 +148,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         const inputs = document.querySelectorAll("input");
         const title = document.getElementById("form-title");
 
-        // Apply saved theme from localStorage
         const savedTheme = localStorage.getItem("theme");
         if (savedTheme === "dark") applyDarkMode(true);
 
@@ -177,7 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             });
         }
 
-        // ✅ Toast Message
         const toastMessage = <?= json_encode($toastMessage) ?>;
         const toastType = <?= json_encode($toastType) ?>;
         if (toastMessage) {
