@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Toast helper function
   function showToast(message, color = "#007aff") {
     Toastify({
       text: message,
@@ -11,7 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }).showToast();
   }
 
-  // Budget Form Submission
   const budgetForm = document.getElementById("budget-form");
   if (budgetForm) {
     budgetForm.addEventListener("submit", function (e) {
@@ -26,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Transaction Form Submission
   const transactionForm = document.getElementById("transaction-form");
   if (transactionForm) {
     transactionForm.addEventListener("submit", function (e) {
@@ -44,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const color = type === "income" ? "#198754" : "#dc3545";
         showToast(message, color);
 
-        // Reset form
         transactionForm.reset();
         document.getElementById("type-selected").textContent =
           "Transaction Type";
@@ -54,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Edit Transaction Save
   const saveEdit = document.getElementById("save-edit");
   if (saveEdit) {
     saveEdit.addEventListener("click", function () {

@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Get raw POST data
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (
@@ -33,7 +32,6 @@ if ($title === '' || $amount === 0 || $type === '') {
     exit();
 }
 
-// Make sure expenses are stored as negative values
 if ($type === 'expense' && $amount > 0) {
     $amount = -$amount;
 }

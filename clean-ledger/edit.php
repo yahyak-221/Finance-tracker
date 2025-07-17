@@ -27,13 +27,11 @@ $amount = floatval($data['amount']);
 $category = isset($data['category']) ? trim($data['category']) : '';
 $type = trim($data['type']);
 
-// Optional: ensure expense has category
 if ($type === 'expense' && $category === '') {
     echo json_encode(['success' => false, 'message' => 'Category required for expense']);
     exit();
 }
 
-// Store expense as negative
 if ($type === 'expense' && $amount > 0) {
     $amount = -$amount;
 }

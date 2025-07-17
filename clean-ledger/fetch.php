@@ -14,7 +14,6 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ensure amount is numeric
     foreach ($transactions as &$txn) {
         $txn['amount'] = (float)$txn['amount'];
     }

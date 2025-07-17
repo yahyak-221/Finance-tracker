@@ -1,4 +1,3 @@
-// DOM Elements
 const form = document.getElementById("transaction-form");
 const textInput = document.getElementById("text");
 const amountInput = document.getElementById("amount");
@@ -201,22 +200,15 @@ function editTransaction(id) {
 
   console.log("Attempting to show edit modal...");
 
-  // *** THE FIX IS HERE ***
-  // 1. Ensure 'hidden' is removed first to make it display: block;
   editModal.classList.remove("hidden");
-  // 2. Remove 'fade-out' if it was lingering from a previous closing
   editModal.classList.remove("fade-out");
-  // 3. Add 'fade-in' to start the opacity transition and enable pointer events
   editModal.classList.add("fade-in");
 
-  // For the modal content animation, ensure it also gets the transform
   const modalContent = editModal.querySelector(".modal-content");
   if (modalContent) {
-    modalContent.classList.remove("fade-out"); // Remove if it was set on closing
-    modalContent.classList.add("fade-in"); // Add if you have a fade-in for content (optional, but good for consistency)
+    modalContent.classList.remove("fade-out");
+    modalContent.classList.add("fade-in");
   }
-  // If you don't have a separate .modal-content.fade-in, you can remove the modalContent related lines above.
-  // The current CSS for .modal.fade-in .modal-content handles the transform.
 }
 
 saveEditBtn.onclick = async () => {
@@ -369,7 +361,6 @@ function updateChart() {
   });
 }
 
-// 🧠 Delegated event handling for edit/delete
 [incomeList, expenseList].forEach((list) => {
   list.addEventListener("click", (e) => {
     const li = e.target.closest("li");
@@ -385,7 +376,6 @@ function updateChart() {
   });
 });
 
-// Init
 form.addEventListener("submit", addTransaction);
 fetchTransactions();
 fetchBudget();

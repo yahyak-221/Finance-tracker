@@ -1,9 +1,8 @@
-// Example: Set your exchange rates manually once
 localStorage.setItem("INRtoUSD", "0.012");
 localStorage.setItem("INRtoEUR", "0.011");
 localStorage.setItem("INRtoGBP", "0.0095");
 
-const baseCurrency = "₹"; // All your transactions are in INR (₹) by default
+const baseCurrency = "₹";
 
 function getExchangeRate(from, to) {
   if (from === to) return 1;
@@ -19,13 +18,11 @@ function getExchangeRate(from, to) {
   return rate;
 }
 
-// Convert amount from one currency to another
 function convertAmount(amount, fromSymbol, toSymbol) {
   const rate = getExchangeRate(fromSymbol, toSymbol);
   return amount * rate;
 }
 
-// Override formatCurrency from script.js non-destructively
 const originalFormatCurrency = window.formatCurrency;
 
 window.formatCurrency = function (amount) {

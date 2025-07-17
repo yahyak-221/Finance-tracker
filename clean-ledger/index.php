@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Redirect to home page if user not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../");
     exit();
@@ -156,12 +155,10 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
                             selected.textContent = item.textContent;
                             hiddenInput.value = item.dataset.value;
                             dropdownList.classList.add("hidden");
-                            // Trigger the onchange event manually (for category toggle)
                             hiddenInput.dispatchEvent(new Event("change"));
                         });
                     });
 
-                    // Close if clicked outside
                     document.addEventListener("click", (e) => {
                         if (!customDropdown.contains(e.target)) {
                             dropdownList.classList.add("hidden");
